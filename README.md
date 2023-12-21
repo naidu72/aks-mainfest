@@ -1,3 +1,4 @@
 =============================================
-This argocd  integration with AKS Cluster
+Argocd  integration with AKS Cluster
 =============================================
+1.
