@@ -1,0 +1,35 @@
+pipeline {
+    agent none
+
+    stages {
+        stage('Checkout') {
+            agent {
+                label 'bastion_host'
+            }
+            steps {
+                // Checkout source code from Git (public repository)
+                git branch: 'test-deploy-stage', url: 'https://github.com/justmeandopensource/playjenkins.git'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            agent {
+                label 'bastion_host'
+            }
+            steps {
+                // Navigate to the directory where nginx.yaml is located
+                //dir('justmeandopensource/playjenkins') {
+                    // Deploy to Kubernetes using kubectl on bastion host
+                    sh "kubectl apply -f nginx.yaml"
+                //}
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+    }
+}
+
