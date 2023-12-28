@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'HELM_CHART_VERSION', defaultValue: '1.0.0', description: 'Helm Chart Version')
+        string(name: 'NAMESPACE', defaultValue: 'default', description: 'Kubernetes Namespace')
+    }
+
+    stages {
+        stage('Install Kibana') {
+            steps {
+                script {
+                    // Define Helm chart values file (values.yaml)
+                    def helmValues = '''
+                    kibana:
+                      version: ${params.HELM_CHART_VERSION}
+                      # Add other chart values as needed
+                    '''
+
+                    // Write Helm values to a temporary file on the bastion host
+                    def valuesFile = sh(script: "echo '${helmValues}' > /tmp/helm-values.yaml && echo '/tmp/helm-values.yaml'", returnStdout: true).trim()
+
+                    // Execute Helm install command on the bastion host
+                    sh "helm install my-kibana stable/kibana --version ${params.HELM_CHART_VERSION} --namespace ${params.NAMESPACE} -f ${valuesFile}"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Kibana installation successful!'
+        }
+    }
+}
+
