@@ -1,4 +1,3 @@
-kibana:
   resources:
     limits:
       cpu: "500m"
